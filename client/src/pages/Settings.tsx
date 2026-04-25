@@ -4,7 +4,6 @@ import '../styles/settings.css';
 import type {
   UserProfileDto,
   UserSettingsDto,
-  NotificationPreferenceDto,
   ThemeMode,
   WeightUnit,
   HeightUnit,
@@ -15,11 +14,8 @@ import {
   clearTokens,
   getUserSettings,
   updateUserSettings,
-  getNotificationPreferences,
-  updateNotificationPreferences,
   changePassword,
   deleteAccount,
-  sendTestNotification,
 } from '../api/client';
 
 // ── helpers ──────────────────────────────────
@@ -34,18 +30,6 @@ const DEFAULT_SETTINGS: UserSettingsDto = {
   units: { weight: 'KG', height: 'CM' },
 };
 
-const DEFAULT_PREFS: NotificationPreferenceDto = {
-  pushEnabled: true,
-  emailEnabled: true,
-  mealReminders: true,
-  expiryAlerts: true,
-  weeklyReport: false,
-  quietHoursStart: null,
-  quietHoursEnd: null,
-  breakfastTime: '08:00',
-  lunchTime: '13:00',
-  dinnerTime: '19:00',
-};
 
 // ── component ────────────────────────────────
 
@@ -54,7 +38,6 @@ export default function Settings() {
 
   const [profile, setProfile] = useState<UserProfileDto | null>(null);
   const [settings, setSettings] = useState<UserSettingsDto>(DEFAULT_SETTINGS);
-  const [prefs, setPrefs] = useState<NotificationPreferenceDto>(DEFAULT_PREFS);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<{ msg: string; type: 'ok' | 'err' } | null>(null);
@@ -86,14 +69,12 @@ export default function Settings() {
   async function loadAll() {
     setLoading(true);
     try {
-      const [pRes, sRes, nRes] = await Promise.allSettled([
+      const [pRes, sRes] = await Promise.allSettled([
         getProfile(),
         getUserSettings(),
-        getNotificationPreferences(),
       ]);
       if (pRes.status === 'fulfilled') setProfile(pRes.value.data);
       if (sRes.status === 'fulfilled') setSettings({ ...DEFAULT_SETTINGS, ...sRes.value.data });
-      if (nRes.status === 'fulfilled') setPrefs({ ...DEFAULT_PREFS, ...nRes.value.data });
     } catch { /* noop */ }
     finally { setLoading(false); }
   }
