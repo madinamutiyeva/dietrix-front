@@ -1,0 +1,193 @@
+/* ============================================================
+   Mobile / iPhone responsiveness — overrides on top of all
+   page-specific stylesheets. Imported LAST in main.tsx.
+
+   Targets:
+   - iPhone SE 1/2 (320–375 px)
+   - iPhone 12/13/14/15 (390 px)
+   - iPhone Plus / Pro Max (414–430 px)
+   ============================================================ */
+
+/* ── Global: prevent horizontal scroll, smoother iOS scroll ── */
+html, body, #root {
+  max-width: 100%;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  -webkit-overflow-scrolling: touch;
+  /* respect iPhone notch / home-indicator */
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* iOS auto-zooms when an input has font-size < 16px on focus.
+   Forcing 16px on every focusable input prevents that. */
+input,
+textarea,
+select,
+button {
+  font-size: 16px;
+}
+
+/* Make any image fluid on small screens. */
+img { max-width: 100%; height: auto; }
+
+/* ── Tablet & smaller (≤768 px) ── */
+@media (max-width: 768px) {
+  /* Most page wrappers had a fixed max-width + horizontal padding
+     that wastes space on phones. */
+  .home-container,
+  .settings-container,
+  .pantry-container,
+  .myplan-container,
+  .aigenerate-container,
+  .chat-container,
+  .profile-container,
+  .auth-container,
+  .onboarding-container {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  .page-title {
+    font-size: 26px !important;
+    line-height: 1.2;
+  }
+  .page-subtitle {
+    font-size: 14px !important;
+  }
+  .page-header {
+    margin-top: 24px !important;
+    margin-bottom: 20px !important;
+  }
+}
+
+/* ── Phone (≤480 px) — main iPhone breakpoint ── */
+@media (max-width: 480px) {
+
+  /* Navbar: stack into one compact row, hide desktop-only links */
+  .navbar {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px 14px !important;
+    border-radius: 22px !important;
+    margin-top: calc(env(safe-area-inset-top) + 8px);
+  }
+  .navbar .logo-text { font-size: 16px; }
+  .nav-links { display: none !important; }
+  .user-menu { gap: 8px; margin-left: auto; }
+  .user-menu .logout-btn,
+  .user-menu .notification-badge {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+  }
+  .user-avatar { width: 38px; height: 38px; font-size: 14px; }
+
+  /* Headers / titles */
+  .page-title { font-size: 22px !important; }
+  .page-subtitle { font-size: 13px !important; }
+
+  /* Cards: less padding + tighter radius */
+  .settings-card,
+  .today-card,
+  .recipe-card,
+  .pantry-card,
+  .ai-card,
+  .plan-card,
+  .profile-card {
+    padding: 16px !important;
+    border-radius: 18px !important;
+  }
+
+  /* Settings rows: stack the toggle below the label on narrow screens */
+  .settings-row {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 10px;
+  }
+  .settings-row .settings-toggle-group,
+  .settings-row .quiet-range,
+  .settings-row > button {
+    width: 100%;
+  }
+  .settings-toggle-group .tg-btn { flex: 1; min-height: 44px; }
+
+  /* Buttons: bigger tap target (Apple HIG min 44 px) */
+  .btn-primary,
+  .btn-secondary,
+  .btn-danger {
+    min-height: 44px;
+    width: 100%;
+    padding: 12px 18px !important;
+  }
+  /* Don't stretch a single inline button */
+  .modal-actions .btn-primary,
+  .modal-actions .btn-secondary,
+  .modal-actions .btn-danger {
+    width: auto;
+    flex: 1;
+  }
+
+  /* Modals: full-width with safe insets, scrollable */
+  .settings-modal-overlay,
+  .modal-overlay {
+    padding: 0 !important;
+    align-items: flex-end !important;
+  }
+  .settings-modal,
+  .modal {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 22px 22px 0 0 !important;
+    padding: 22px 18px calc(22px + env(safe-area-inset-bottom)) !important;
+  }
+  .modal-actions {
+    display: flex;
+    flex-direction: row !important;
+    gap: 10px;
+  }
+
+  /* Toasts (notifications) — full-width bar at top */
+  div[style*="position: fixed"][style*="top: 16px"][style*="right: 16px"] {
+    left: 8px !important;
+    right: 8px !important;
+    top: calc(env(safe-area-inset-top) + 8px) !important;
+    max-width: none !important;
+  }
+
+  /* Forms */
+  .auth-card,
+  .onboarding-card {
+    padding: 24px 18px !important;
+    border-radius: 22px !important;
+  }
+  input, textarea, select {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Chat: keep the input row above the home indicator */
+  .chat-input-bar,
+  .chat-composer {
+    padding-bottom: calc(12px + env(safe-area-inset-bottom)) !important;
+  }
+}
+
+/* ── Tiny phones (iPhone SE 1, ≤375 px) ── */
+@media (max-width: 375px) {
+  .navbar { padding: 8px 12px !important; }
+  .navbar .logo-text { display: none; }
+  .page-title { font-size: 20px !important; }
+  .settings-card,
+  .today-card,
+  .recipe-card,
+  .pantry-card,
+  .ai-card,
+  .plan-card { padding: 14px !important; }
+}
+

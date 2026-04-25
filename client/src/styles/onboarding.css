@@ -1,0 +1,313 @@
+/* ============================================================
+   DIETRIX — Onboarding styles
+   ============================================================ */
+
+/* ── Section wrapper ───────────────────────── */
+.ob-section {
+  margin-top: 8px;
+}
+
+/* ── Step label ────────────────────────────── */
+.step-label {
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-soft);
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+/* ── Gender row ────────────────────────────── */
+.ob-gender-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.ob-gender-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 20px;
+  border: 2px solid var(--primary-light);
+  background: white;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-dark);
+  cursor: pointer;
+  transition: all 0.25s;
+  font-family: 'Inter', sans-serif;
+}
+
+.ob-gender-btn i {
+  font-size: 20px;
+  color: var(--primary);
+}
+
+.ob-gender-btn:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.ob-gender-btn.selected {
+  background: var(--primary-light);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* ── Option list (Activity Level) ──────────── */
+.ob-option-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.ob-option-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 14px 18px;
+  border-radius: 16px;
+  border: 2px solid var(--primary-light);
+  background: white;
+  cursor: pointer;
+  transition: all 0.25s;
+  text-align: left;
+  font-family: 'Inter', sans-serif;
+}
+
+.ob-option-btn:hover {
+  border-color: var(--primary);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.ob-option-btn.selected {
+  background: var(--primary-light);
+  border-color: var(--primary);
+}
+
+.ob-option-label {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-dark);
+}
+
+.ob-option-desc {
+  font-size: 12px;
+  color: var(--text-soft);
+  margin-top: 2px;
+}
+
+/* ── Goal grid ─────────────────────────────── */
+.ob-goal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.ob-goal-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 18px 10px;
+  border-radius: 20px;
+  border: 2px solid var(--primary-light);
+  background: white;
+  cursor: pointer;
+  transition: all 0.25s;
+  font-family: 'Inter', sans-serif;
+}
+
+.ob-goal-btn i {
+  font-size: 22px;
+  color: var(--primary);
+}
+
+.ob-goal-btn:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.ob-goal-btn.selected {
+  background: var(--primary-light);
+  border-color: var(--primary);
+}
+
+.ob-goal-label {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-dark);
+}
+
+.ob-goal-desc {
+  font-size: 11px;
+  color: var(--text-soft);
+}
+
+/* ── Navigation row (Back / Continue) ──────── */
+.ob-nav-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.ob-back-btn {
+  flex: 0 0 auto;
+  background: white;
+  color: var(--text-soft);
+  border: 2px solid var(--primary-light);
+  padding: 14px 20px;
+  font-size: 14px;
+}
+
+.ob-back-btn:hover:not(:disabled) {
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.ob-next-btn {
+  flex: 1;
+}
+
+/* ── Chip grid (Diet Type / Allergies) ─────── */
+.ob-chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.ob-chip {
+  padding: 8px 16px;
+  border-radius: 30px;
+  border: 2px solid var(--primary-light);
+  background: white;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-dark);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Inter', sans-serif;
+}
+
+.ob-chip:hover {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.ob-chip.selected {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.ob-chip.warn.selected {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+/* ── Tag input (liked / disliked foods) ────── */
+.ob-tag-input-wrapper {
+  border: 2px solid var(--primary-light);
+  border-radius: 16px;
+  background: white;
+  padding: 10px 14px;
+  transition: border-color 0.3s;
+}
+
+.ob-tag-input-wrapper:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(45, 106, 79, 0.1);
+}
+
+.ob-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.ob-tags:empty {
+  margin-bottom: 0;
+}
+
+.ob-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.ob-tag.dislike {
+  background: #fff5f5;
+  color: var(--error);
+}
+
+.ob-tag button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.ob-tag button:hover {
+  opacity: 1;
+}
+
+.ob-tag-input {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  color: var(--text-dark);
+  background: transparent;
+  padding: 4px 0;
+}
+
+.ob-tag-input::placeholder {
+  color: #a0aec0;
+  font-size: 13px;
+}
+
+/* ── Responsive ────────────────────────────── */
+@media (max-width: 480px) {
+  .ob-goal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ob-gender-row {
+    grid-template-columns: 1fr;
+  }
+
+  .ob-nav-row {
+    flex-direction: column;
+  }
+
+  .ob-back-btn {
+    order: 1;
+  }
+}
+

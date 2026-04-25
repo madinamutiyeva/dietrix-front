@@ -1,0 +1,422 @@
+/* ════════════════════════════════════════════
+   DIETRIX — Settings page
+   ════════════════════════════════════════════ */
+
+.settings-page {
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+.settings-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.settings-card {
+  background: white;
+  border-radius: 30px;
+  padding: 28px 32px;
+  margin-bottom: 24px;
+  border: 1px solid var(--primary-light);
+  box-shadow: var(--shadow-sm);
+}
+
+.settings-section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-dark);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--primary-light);
+}
+
+.settings-section-title i {
+  color: var(--primary);
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 16px 0;
+  border-bottom: 1px solid #f1f5f9;
+  flex-wrap: wrap;
+}
+
+.settings-row:last-child {
+  border-bottom: none;
+}
+
+.settings-row-info {
+  flex: 1;
+  min-width: 200px;
+}
+
+.settings-row-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 3px;
+}
+
+.settings-row-desc {
+  font-size: 13px;
+  color: var(--text-soft);
+}
+
+/* Toggle group */
+.settings-toggle-group {
+  display: flex;
+  background: #f1f5f9;
+  border-radius: 30px;
+  padding: 4px;
+  gap: 2px;
+  flex-wrap: wrap;
+}
+
+.tg-btn {
+  background: transparent;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 26px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-soft);
+  cursor: pointer;
+  transition: 0.2s;
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.tg-btn:hover:not(:disabled) {
+  color: var(--text-dark);
+}
+
+.tg-btn.active {
+  background: white;
+  color: var(--primary);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.tg-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Switch */
+.switch {
+  position: relative;
+  width: 50px;
+  height: 28px;
+  background: #cbd5e1;
+  border: none;
+  border-radius: 28px;
+  cursor: pointer;
+  transition: 0.3s;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.switch.on {
+  background: var(--primary);
+}
+
+.switch-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  background: white;
+  border-radius: 50%;
+  transition: 0.3s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.switch.on .switch-knob {
+  left: 25px;
+}
+
+/* Time inputs */
+.settings-meal-times {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+  padding: 12px 0 18px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.meal-time-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: #f8fafc;
+  border-radius: 20px;
+  padding: 10px 14px;
+}
+
+.meal-time-row label {
+  font-size: 13px;
+  color: var(--text-dark);
+  font-weight: 500;
+}
+
+.meal-time-row input,
+.quiet-range input {
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 6px 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: var(--text-dark);
+  background: white;
+  outline: none;
+}
+
+.meal-time-row input:focus,
+.quiet-range input:focus {
+  border-color: var(--primary);
+}
+
+.quiet-range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+/* Buttons */
+.btn-primary,
+.btn-secondary,
+.btn-danger {
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  border: none;
+  transition: 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #1e4d3a;
+}
+
+.btn-secondary {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-danger {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #dc2626;
+  color: white;
+}
+
+.btn-primary:disabled,
+.btn-secondary:disabled,
+.btn-danger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.danger-row {
+  background: #fef2f2;
+  border-radius: 20px;
+  padding: 14px 18px !important;
+  margin-top: 10px;
+  border: 1px solid #fecaca;
+  border-bottom: 1px solid #fecaca !important;
+}
+
+/* Toast */
+.settings-toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-weight: 600;
+  font-size: 14px;
+  z-index: 2000;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  animation: toastSlide 0.3s ease-out;
+}
+
+.toast-ok {
+  background: var(--primary);
+  color: white;
+}
+
+.toast-err {
+  background: #dc2626;
+  color: white;
+}
+
+@keyframes toastSlide {
+  from { opacity: 0; transform: translate(-50%, 20px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* Modals */
+.settings-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1500;
+  padding: 20px;
+}
+
+.settings-modal {
+  background: white;
+  border-radius: 30px;
+  padding: 32px;
+  max-width: 460px;
+  width: 100%;
+  position: relative;
+  animation: modalIn 0.25s ease-out;
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.settings-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: var(--primary-light);
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--text-soft);
+  font-size: 14px;
+}
+
+.settings-modal-close:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.settings-modal h2 {
+  font-size: 22px;
+  margin-bottom: 8px;
+  color: var(--text-dark);
+}
+
+.modal-desc {
+  color: var(--text-soft);
+  font-size: 14px;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.settings-modal input {
+  width: 100%;
+  padding: 12px 18px;
+  border: 1px solid var(--primary-light);
+  border-radius: 30px;
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  margin-bottom: 12px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.settings-modal input:focus {
+  border-color: var(--primary);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 18px;
+}
+
+/* Theme: Dark mode */
+[data-theme="dark"] {
+  --text-dark: #f1f5f9;
+  --text-soft: #cbd5e1;
+  --text-gray: #94a3b8;
+  --primary-light: #1e293b;
+  --glass-bg: rgba(30, 41, 59, 0.6);
+  --glass-border: rgba(148, 163, 184, 0.1);
+}
+
+[data-theme="dark"] body {
+  background: radial-gradient(circle at 10% 30%, #0f172a 0%, #1e293b 100%);
+}
+
+[data-theme="dark"] .settings-card,
+[data-theme="dark"] .today-card,
+[data-theme="dark"] .navbar,
+[data-theme="dark"] .recipe-card,
+[data-theme="dark"] .meal-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .tg-btn.active {
+  background: #334155;
+  color: #4ade80;
+}
+
+[data-theme="dark"] .settings-toggle-group {
+  background: #0f172a;
+}
+
+@media (max-width: 600px) {
+  .settings-card {
+    border-radius: 22px;
+    padding: 22px 20px;
+  }
+  .settings-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .settings-toggle-group {
+    width: 100%;
+    overflow-x: auto;
+  }
+  .tg-btn { flex: 1; justify-content: center; }
+}
+
