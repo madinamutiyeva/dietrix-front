@@ -24,6 +24,7 @@ import {
   getDashboard,
   getWaterToday,
   addWaterLog,
+  deleteWaterLog,
   getRecipeById,
 } from '../api/client';
 
@@ -107,6 +108,9 @@ export default function Home() {
   const [recipe, setRecipe] = useState<RecipeDetailDto | null>(null);
   const [recipeLoading, setRecipeLoading] = useState(false);
 
+  // confirm modal for "Reset water"
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+
   async function openRecipe(id: number) {
     setRecipeOpen(true);
     setRecipeLoading(true);
@@ -174,44 +178,108 @@ export default function Home() {
     }
   }
 
-  async function handleAddWater(ml: number) {
-    if (addingWater) return;
-    setAddingWater(true);
+  /** Refetch authoritative water + dashboard state from the backend. */
+  async function refreshWater() {
     try {
-      const res = await addWaterLog({ amountMl: ml });
-      // optimistic update — guard against missing logs array
-      setWater((prev) => {
-        if (!prev) {
-          return {
-            logs: [{ id: res.data.id, amountMl: ml, loggedAt: res.data.loggedAt }],
-            totalMl: ml,
-            targetMl: dashboard?.waterTargetMl ?? 2400,
-            progressPercent: Math.min(100, (ml / (dashboard?.waterTargetMl ?? 2400)) * 100),
-          };
-        }
-        const newTotal = prev.totalMl + ml;
-        return {
-          ...prev,
-          totalMl: newTotal,
-          progressPercent: Math.min(100, (newTotal / Math.max(1, prev.targetMl)) * 100),
-          logs: [...(prev.logs ?? []), { id: res.data.id, amountMl: ml, loggedAt: res.data.loggedAt }],
-        };
-      });
-      // refresh dashboard counters
-      try {
-        const d = await getDashboard();
-        setDashboard(d.data);
-      } catch { /* noop */ }
-    } catch {
-      /* show toast in future */
-    } finally {
-      setAddingWater(false);
-    }
+      const [w, d] = await Promise.allSettled([getWaterToday(), getDashboard()]);
+      if (w.status === 'fulfilled') setWater(w.value.data);
+      if (d.status === 'fulfilled') setDashboard(d.value.data);
+    } catch { /* noop */ }
   }
 
   function handleLogout() {
     clearTokens();
     navigate('/sign-in', { replace: true });
+  }
+
+  async function handleAddWater(ml: number) {
+    if (addingWater) return;
+    setAddingWater(true);
+    // Optimistic UI bump so the number changes instantly.
+    setWater((prev) => {
+      const targetMl = prev?.targetMl ?? dashboard?.waterTargetMl ?? 2400;
+      const newTotal = (prev?.totalMl ?? 0) + ml;
+      return {
+        logs: [...(prev?.logs ?? []), { id: -Date.now(), amountMl: ml, loggedAt: new Date().toISOString() }],
+        totalMl: newTotal,
+        targetMl,
+        progressPercent: Math.min(100, (newTotal / Math.max(1, targetMl)) * 100),
+      };
+    });
+    try {
+      await addWaterLog({ amountMl: ml });
+      await refreshWater();          // reconcile with server (replaces fake id with real one)
+    } catch {
+      await refreshWater();          // revert on failure
+    } finally {
+      setAddingWater(false);
+    }
+  }
+
+
+  /** Wipe ALL water entries for today.
+   *  Backend's /water-logs/today doesn't expose log ids, so we try several
+   *  routes a typical Spring backend may have, in order. */
+  async function handleResetWater() {
+    if (addingWater) return;
+    setShowResetConfirm(true);
+  }
+
+  async function performResetWater() {
+    setShowResetConfirm(false);
+    setAddingWater(true);
+
+    const tryFetch = async (url: string, init: RequestInit = {}): Promise<Response | null> => {
+      try {
+        const token = getAccessToken();
+        const r = await fetch(url, {
+          ...init,
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            ...(init.headers ?? {}),
+          },
+        });
+        return r;
+      } catch { return null; }
+    };
+
+    const apiBase = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '') + '/api';
+    const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+
+    try {
+      // (1) Try a clear-all-today endpoint.
+      let r = await tryFetch(`${apiBase}/users/me/water-logs/today`, { method: 'DELETE' });
+      if (r && r.ok) {
+        await refreshWater();
+        return;
+      }
+
+      // (2) Try listing logs by date and deleting each.
+      r = await tryFetch(`${apiBase}/users/me/water-logs?date=${today}`);
+      if (r && r.ok) {
+        const body = await r.json().catch(() => null);
+        const arr: any[] = Array.isArray(body) ? body : (body?.data ?? body?.logs ?? []);
+        const ids = arr.map((l) => l?.id).filter((id) => Number(id) > 0);
+        if (ids.length > 0) {
+          await Promise.allSettled(ids.map((id) => deleteWaterLog(id)));
+          await refreshWater();
+          return;
+        }
+      }
+
+      // (3) Nothing worked.
+      // eslint-disable-next-line no-console
+      console.warn('Reset: no working endpoint found.');
+      alert(
+        'Reset is not supported by the backend yet.\n\n' +
+        'It needs one of:\n' +
+        '  • DELETE /api/users/me/water-logs/today, or\n' +
+        '  • GET /api/users/me/water-logs?date=YYYY-MM-DD returning [{id, amountMl, ...}]',
+      );
+    } finally {
+      setAddingWater(false);
+    }
   }
 
   const firstName = profile?.name?.split(' ')[0] ?? '';
@@ -324,34 +392,66 @@ export default function Home() {
                   />
                 </div>
                 <div className="macros-row">
-                  <span className="macro"><b>{Math.round(dashboard.todayProtein)}g</b> P</span>
-                  <span className="macro"><b>{Math.round(dashboard.todayCarbs)}g</b> C</span>
-                  <span className="macro"><b>{Math.round(dashboard.todayFat)}g</b> F</span>
+                  {(() => {
+                    const p = Math.round(Number(dashboard.todayProtein) || 0);
+                    const c = Math.round(Number(dashboard.todayCarbs) || 0);
+                    const f = Math.round(Number(dashboard.todayFat) || 0);
+                    return (
+                      <>
+                        <span className="macro"><b>{`${p}g`}</b> P</span>
+                        <span className="macro"><b>{`${c}g`}</b> C</span>
+                        <span className="macro"><b>{`${f}g`}</b> F</span>
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
 
               {/* Water */}
-              <div className="today-card today-card-water">
-                <div className="today-card-header">
-                  <i className="fas fa-glass-water" />
-                  <span>Water</span>
-                </div>
-                <div className="today-card-value">
-                  <strong>{((water?.totalMl ?? dashboard.waterConsumedMl) / 1000).toFixed(2)}</strong>
-                  <span> / {((water?.targetMl ?? dashboard.waterTargetMl) / 1000).toFixed(1)} L</span>
-                </div>
-                <div className="today-progress">
-                  <div
-                    className="today-progress-bar today-progress-water"
-                    style={{ width: `${Math.min(100, water?.progressPercent ?? ((dashboard.waterConsumedMl / Math.max(1, dashboard.waterTargetMl)) * 100))}%` }}
-                  />
-                </div>
-                <div className="water-buttons">
-                  <button onClick={() => handleAddWater(250)} disabled={addingWater}>+250 ml</button>
-                  <button onClick={() => handleAddWater(500)} disabled={addingWater}>+500 ml</button>
-                  <button onClick={() => handleAddWater(750)} disabled={addingWater}>+750 ml</button>
-                </div>
-              </div>
+              {(() => {
+                const w: any = water;
+                const rawTotal  = w?.totalMl  ?? w?.consumedMl ?? dashboard.waterConsumedMl;
+                const rawTarget = w?.targetMl ?? dashboard.waterTargetMl;
+                const totalMl   = Number.isFinite(Number(rawTotal))  ? Number(rawTotal)  : 0;
+                const targetMl  = Number.isFinite(Number(rawTarget)) && Number(rawTarget) > 0
+                  ? Number(rawTarget)
+                  : 2400;
+                const rawPct = w?.progressPercent ?? w?.percent;
+                const progressPct = Number.isFinite(Number(rawPct))
+                  ? Number(rawPct)
+                  : (totalMl / targetMl) * 100;
+                return (
+                  <div className="today-card today-card-water">
+                    <div className="today-card-header">
+                      <i className="fas fa-glass-water" />
+                      <span>Water</span>
+                    </div>
+                    <div className="today-card-value">
+                      <strong>{(totalMl / 1000).toFixed(2)}</strong>
+                      <span> / {(targetMl / 1000).toFixed(1)} L</span>
+                    </div>
+                    <div className="today-progress">
+                      <div
+                        className="today-progress-bar today-progress-water"
+                        style={{ width: `${Math.min(100, Math.max(0, progressPct))}%` }}
+                      />
+                    </div>
+                    <div className="water-buttons">
+                      <button onClick={() => handleAddWater(250)} disabled={addingWater}>+250 ml</button>
+                      <button onClick={() => handleAddWater(500)} disabled={addingWater}>+500 ml</button>
+                      <button onClick={() => handleAddWater(750)} disabled={addingWater}>+750 ml</button>
+                      <button
+                        onClick={handleResetWater}
+                        disabled={addingWater || totalMl <= 0}
+                        title="Clear all water for today"
+                        style={{ background: 'transparent', color: '#dc2626' }}
+                      >
+                        <i className="fas fa-trash" /> Reset
+                      </button>
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* Plan progress */}
               <div className="today-card today-card-plan">
@@ -656,6 +756,31 @@ export default function Home() {
                 Recipe not found.
               </p>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* ═══ Reset water confirmation modal ═════════ */}
+      {showResetConfirm && (
+        <div className="modal-overlay" onClick={() => setShowResetConfirm(false)}>
+          <div className="modal-content modal-confirm" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Confirm reset</h2>
+              <button className="modal-close" onClick={() => setShowResetConfirm(false)}>
+                <i className="fas fa-times" />
+              </button>
+            </div>
+            <div className="modal-body">
+              <p>Are you sure you want to remove all water entries for today?</p>
+            </div>
+            <div className="modal-footer">
+              <button className="modal-btn" onClick={performResetWater}>
+                <i className="fas fa-check" /> Yes, reset
+              </button>
+              <button className="modal-btn modal-btn-cancel" onClick={() => setShowResetConfirm(false)}>
+                <i className="fas fa-times" /> Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}
