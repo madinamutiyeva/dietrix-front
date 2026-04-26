@@ -547,35 +547,57 @@ export default function AiGenerate() {
         </div>
       </div>
 
-      {/* ═══ Recipe detail modal ═════════════ */}
+      {/* ═══ Recipe detail modal (Home-style) ═════════════ */}
       {(viewRecipe || viewLoading) && (
-        <div className="recipe-modal-overlay" onClick={() => { if (!viewLoading) setViewRecipe(null); }}>
-          <div className="recipe-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="recipe-modal-close" onClick={() => setViewRecipe(null)}>✕</button>
+        <div className="modal-overlay" onClick={() => { if (!viewLoading) setViewRecipe(null); }}>
+          <div className="modal-content modal-recipe" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>{viewLoading ? 'Loading…' : viewRecipe?.title ?? 'Recipe'}</h2>
+              <button className="modal-close" onClick={() => setViewRecipe(null)}>
+                <i className="fas fa-times" />
+              </button>
+            </div>
 
             {viewLoading ? (
-              <div style={{ textAlign: 'center', padding: 40 }}>
+              <div style={{ textAlign: 'center', padding: '30px 0' }}>
                 <div className="spinner" style={{ margin: '0 auto 16px', width: 32, height: 32, borderWidth: 4, borderColor: 'var(--primary-light)', borderTopColor: 'var(--primary)' }} />
                 <p style={{ color: 'var(--text-soft)' }}>Loading recipe…</p>
               </div>
             ) : viewRecipe && (
-              <>
-                <h2>{viewRecipe.title}</h2>
-                {viewRecipe.cuisine && <span className="modal-cuisine">{viewRecipe.cuisine}</span>}
-                <p className="modal-desc">{viewRecipe.description}</p>
+              <div className="recipe-detail">
+                {viewRecipe.description && (
+                  <p className="recipe-detail-desc">{viewRecipe.description}</p>
+                )}
 
-                <div className="modal-macros">
-                  <span className="modal-macro-tag"><i className="fas fa-fire" /> {viewRecipe.calories} kcal</span>
-                  <span className="modal-macro-tag"><i className="fas fa-dumbbell" /> P: {viewRecipe.protein}g</span>
-                  <span className="modal-macro-tag"><i className="fas fa-bread-slice" /> C: {viewRecipe.carbs}g</span>
-                  <span className="modal-macro-tag"><i className="fas fa-droplet" /> F: {viewRecipe.fat}g</span>
-                  <span className="modal-macro-tag"><i className="fas fa-clock" /> {viewRecipe.cookTimeMinutes} min</span>
+                <div className="recipe-macros">
+                  <span className="macro-badge macro-cal">
+                    <i className="fas fa-fire" /> {viewRecipe.calories} kcal
+                  </span>
+                  <span className="macro-badge macro-p">
+                    <i className="fas fa-drumstick-bite" /> {viewRecipe.protein}g protein
+                  </span>
+                  <span className="macro-badge macro-c">
+                    <i className="fas fa-wheat-awn" /> {viewRecipe.carbs}g carbs
+                  </span>
+                  <span className="macro-badge macro-f">
+                    <i className="fas fa-droplet" /> {viewRecipe.fat}g fat
+                  </span>
+                  {viewRecipe.cookTimeMinutes > 0 && (
+                    <span className="macro-badge">
+                      <i className="fas fa-clock" /> {viewRecipe.cookTimeMinutes} min
+                    </span>
+                  )}
+                  {viewRecipe.cuisine && (
+                    <span className="macro-badge">
+                      <i className="fas fa-earth-americas" /> {viewRecipe.cuisine}
+                    </span>
+                  )}
                 </div>
 
                 {viewRecipe.ingredients && viewRecipe.ingredients.length > 0 && (
-                  <>
+                  <div className="recipe-section">
                     <h3><i className="fas fa-list" /> Ingredients</h3>
-                    <ul className="modal-ingredients-list">
+                    <ul className="recipe-ingredients">
                       {viewRecipe.ingredients.map((ing) => {
                         const inPantry = pantryItems.some(
                           (p) => p.name.toLowerCase().includes(ing.name.toLowerCase()) ||
@@ -583,22 +605,29 @@ export default function AiGenerate() {
                         );
                         return (
                           <li key={ing.id}>
-                            <span style={{ color: inPantry ? 'var(--primary)' : 'var(--text-dark)', fontWeight: inPantry ? 600 : 400 }}>
+                            <span
+                              className="ing-name"
+                              style={inPantry ? { color: 'var(--primary)', fontWeight: 600 } : undefined}
+                            >
                               {inPantry ? '✓ ' : ''}{ing.name}
                             </span>
-                            <span style={{ color: 'var(--text-gray)' }}>{ing.amount} {ing.unit}</span>
+                            <span className="ing-amount">{ing.amount} {ing.unit}</span>
                           </li>
                         );
                       })}
                     </ul>
-                  </>
+                  </div>
                 )}
 
                 {viewRecipe.instructions && (
-                  <>
-                    <h3><i className="fas fa-book-open" /> Instructions</h3>
-                    <div className="modal-instructions">{viewRecipe.instructions}</div>
-                  </>
+                  <div className="recipe-section">
+                    <h3><i className="fas fa-utensils" /> Instructions</h3>
+                    <div className="recipe-instructions">
+                      {viewRecipe.instructions.split('\n').map((line, i) => (
+                        <p key={i}>{line}</p>
+                      ))}
+                    </div>
+                  </div>
                 )}
 
                 {/* V12 — Add to today's plan */}
@@ -614,7 +643,7 @@ export default function AiGenerate() {
                     <i className="fas fa-calendar-plus" /> Add to today's plan
                   </button>
                 </div>
-              </>
+              </div>
             )}
           </div>
         </div>
