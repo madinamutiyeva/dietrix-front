@@ -263,6 +263,14 @@ export default function SignUp() {
             </Link>
           </div>
 
+          {/* Back */}
+          <div className="back-link">
+            <Link to="/">
+              <i className="fas fa-arrow-left" />
+              Back to Home
+            </Link>
+          </div>
+
         </div>
       </div>
     </>

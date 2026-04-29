@@ -542,21 +542,19 @@ export default function Chat() {
                       <span>{item.question}</span>
                       <i className="fas fa-chevron-down chevron" />
                     </div>
-                    {activeFaqId === item.id && (
-                      <div className="faq-answer">
-                        {item.answer}
-                        <button
-                          className="faq-ask-btn"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleSend(item.question);
-                          }}
-                        >
-                          <i className="fas fa-paper-plane" style={{ marginRight: 6 }} />
-                          Ask in chat
-                        </button>
-                      </div>
-                    )}
+                    <div className="faq-answer">
+                      {item.answer}
+                      <button
+                        className="faq-ask-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSend(item.question);
+                        }}
+                      >
+                        <i className="fas fa-paper-plane" style={{ marginRight: 6 }} />
+                        Ask in chat
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>

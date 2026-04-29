@@ -80,10 +80,12 @@
 }
 
 .chat-messages {
-  height: 480px;
+  flex: 1;
+  min-height: 200px;
+  max-height: 480px;
   overflow-y: auto;
   padding-right: 10px;
-  margin-bottom: 25px;
+  margin-bottom: 15px;
 }
 
 .chat-messages::-webkit-scrollbar {
@@ -190,7 +192,6 @@
 .chat-input-area {
   display: flex;
   gap: 12px;
-  margin-top: auto;
 }
 
 .chat-input {
